@@ -1,0 +1,11 @@
+# 1D reference plot
+
+import numpy as np
+import pandas as pd
+
+#array = np.genfromtxt('reference_solution_1D.dat')
+diff = pd.DataFrame(np.genfromtxt('reference_solution_1D.dat'), columns = ['x','phi'])
+
+graph = diff.plot(y = 'phi', x ='x', figsize = [10,12], ylim = [0,1], title = '1D diffusion plot')
+graph.set_ylabel("phi")
+graph.legend(["Reference solution"]);
