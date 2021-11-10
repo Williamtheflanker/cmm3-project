@@ -1,11 +1,36 @@
-# 1D reference plot
-
+# -*- coding: utf-8 -*-
 import numpy as np
+import matplotlib.pyplot as plt
 import pandas as pd
 
-#array = np.genfromtxt('reference_solution_1D.dat')
-diff = pd.DataFrame(np.genfromtxt('reference_solution_1D.dat'), columns = ['x','phi'])
 
-graph = diff.plot(y = 'phi', x ='x', figsize = [10,12], ylim = [0,1], title = '1D diffusion plot')
-graph.set_ylabel("phi")
-graph.legend(["Reference solution"]);
+num_sims = 3  # Display five runs
+
+t_init = 0
+t_end  = 1
+N      = 64  #grid points
+dt     = float(t_end - t_init)
+y_init = 1
+
+
+def dW(delta_t):
+    """Sample a random number at each call."""
+    return np.random.normal(loc=0.0, scale=np.sqrt(delta_t))
+#loc=0.0, scale=np.sqrt(delta_t)
+x = np.linspace(-1,1,65)
+#ts = np.arange(t_init, t_end + dt, dt)
+ys = np.zeros(N+1)
+
+ys[0] = y_init
+
+for _ in range(num_sims):
+    for i in range(1, x.size):
+        t = t_init + (i - 1) * dt
+        y = ys[i - 1]
+        ys[i] = y + np.sqrt(0.2) * dW(dt)
+    plt.plot(x, ys)
+
+plt.xlabel("x")
+plt.ylabel("phi")
+plt.ylim(0,1)
+plt.show()
