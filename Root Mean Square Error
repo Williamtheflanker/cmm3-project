@@ -1,0 +1,49 @@
+import matplotlib.colors
+import numpy as np
+import simulation
+
+# 0 is red, 1 is blue
+color_dictionary = {
+    "red": (1, 0, 0),
+    "blue": (0, 0, 1),
+}
+
+# Read reference solution from file.
+reference_coordinates, reference_concentration = simulation.read_data_file("reference_solution_1D.dat", [0], [1])
+
+concentrations = []
+
+for dt in np.linspace(0.01, 0.03, 3):
+    run = simulation.Simulation(dt, 0.2, -1, 1, -1, 1, 65536, 64, 1, 0.1)
+    run.add_rectangle([-1, -1], [1, 2], 1)
+    run.simulate()
+    run.calculate_concentrations()
+    concentrations.append(run.concentrations)
+
+####################################################################
+x = np.linspace(-1,1,64)
+
+y0 = concentrations[0].flatten()
+y1 = concentrations[1].flatten()
+y2 = concentrations[2].flatten()
+
+h = np.genfromtxt('reference_solution_1D.dat')
+yR = h[0:,1]
+xR = h[0:,0]
+
+#This is the interesting bit
+#RMSE
+
+RMS_errors0 = []
+RMS_errors1 = []
+RMS_errors2 = []
+
+for n in range(63):
+    n0 = np.sqrt(((yR[9*n] - y0[n])**2)/64)
+    RMS_errors0.append(n0)
+    
+    n1 = np.sqrt(((yR[9*n] - y1[n])**2)/64)
+    RMS_errors1.append(n1)
+    
+    n2 = np.sqrt(((yR[9*n] - y2[n])**2)/64)
+    RMS_errors2.append(n2)
