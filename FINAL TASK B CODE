@@ -1,0 +1,158 @@
+import matplotlib.colors
+import numpy as np
+import simulation
+from scipy.optimize import curve_fit
+from sympy import symbols
+import pylab as pl
+import matplotlib.pyplot as plt
+
+# 0 is red, 1 is blue
+color_dictionary = {
+    "red": (1, 0, 0),
+    "blue": (0, 0, 1),
+}
+
+# Read reference solution from file.
+reference_coordinates, reference_concentration = simulation.read_data_file("reference_solution_1D.dat", [0], [1])
+
+# List of concentrations
+concentrations = []
+
+# Array of values of different numbers of particles, lower values are repeated more often for accuracy
+L = np.array([10000, 10000, 10000, 10000, 10000, 100000, 15000, 15000, 15000, 15000, 15000, 15000,
+              17000, 17000, 17000, 17000, 17000, 17000, 20000, 20000, 20000, 20000, 20000, 30000, 30000
+              , 30000, 30000, 30000, 50000, 50000, 50000, 50000, 80000, 80000, 80000, 80000, 100000, 100000, 
+              100000, 100000, 150000, 150000, 150000, 150000, 
+              200000, 200000, 200000, 250000, 250000, 250000, 300000, 
+              300000, 400000, 400000, 500000, 500000, 600000, 600000, 800000, 800000, 1000000, 1000000])
+
+# Loop to get values of concentrations with 3 different time-steps
+for i in L:
+    for dt in np.linspace(0.01, 0.03, 3):
+        run = simulation.Simulation(dt, 0.2, -1, 1, -1, 1, i, 64, 1, 0.1)
+        run.add_rectangle([-1, -1], [1, 2], 1)
+        run.simulate()
+        run.calculate_concentrations()
+        concentrations.append(run.concentrations)
+    
+# Genereating arrays from reference solution
+h = np.genfromtxt('reference_solution_1D.dat')
+yR = h[0:,1]
+xR = h[0:,0]
+
+# Making the concentration arrays useable
+flat = []
+
+for i in range(186):
+    y = concentrations[i].flatten()
+    flat.append(y)
+
+    
+# Fidning the difference in values of the concentrations and the reference solution
+RMS_errors = []
+
+for i in np.linspace(0,185,186):
+    for n in range(64):
+        n0 = (yR[9*n] - flat[int(i)][n])**2
+        RMS_errors.append(n0)
+        
+        
+
+# Averaging every 64 values so each value becomes the error of one sepcific timestep and particle size        
+LEN = 64
+
+def avg(data):
+    datasum = cnt = 0 
+    for num in data:
+        datasum += num
+        cnt += 1
+        if cnt == LEN: 
+            yield datasum / LEN
+            datasum = cnt = 0 
+    if cnt: 
+        yield datasum / cnt
+    
+RMSE_avg = list(avg(RMS_errors))
+
+# Finishing the rest of the Root Mean Square Equation to get the global errors
+RMSE_Us = []
+
+for i in range(186):
+    hh = np.sqrt(RMSE_avg[i]/64)
+    RMSE_Us.append(hh)
+
+# Averaging every 3 values so that the time-steps are averagred for each particle size    
+LEN2 = 3
+
+def DTavg(values):
+    datasum = cnt = 0 
+    for num in values:
+        datasum += num
+        cnt += 1
+        if cnt == LEN2: 
+            yield datasum / LEN2
+            datasum = cnt = 0 
+    if cnt: 
+        yield datasum / cnt
+        
+RMSE_DTavg = list(DTavg(RMSE_Us))
+
+
+
+##############################################################################################################################
+
+# Fitting the graph
+
+def func(w, a, b):
+    return a*(w)**(b)
+
+pars, cov = curve_fit(func, L, RMSE_DTavg)
+
+a = round(pars[0], 2)
+b = round(pars[1], 2)  # beta
+
+
+# Printing the fitting equation 
+
+E, Np = symbols('E Np')
+
+answr = a*(Np)**b
+
+
+############################################################################################################################
+
+# Plotting the graph normally
+
+x_tester = np.linspace(5000, 1000000, 100)
+y = a*(x_tester)**b
+
+pl.figure(figsize=(8, 6))
+pl.scatter(L, RMSE_DTavg, label = 'Data points')
+pl.plot(x_tester, y, 'r--', label = 'Trendline')
+pl.legend()
+pl.title('Np vs E')
+pl.xlabel('Np')
+pl.ylabel('E')
+pl.grid()
+pl.show()
+
+################################################################################################################################
+
+# Plotting the log graph
+
+plt.figure(figsize=(8, 6))
+plt.scatter(L, RMSE_DTavg, label = 'Data points')
+plt.plot(x_tester, y, 'r--', label = 'Trendline')
+plt.legend()
+plt.yscale('log')
+plt.xscale('log')
+plt.title('Np vs E (log scale)')
+plt.xlabel('Np')
+plt.ylabel('E')
+plt.grid()
+plt.show()
+
+
+#################################################################################################################################
+# Showing final fitting equation
+answr
