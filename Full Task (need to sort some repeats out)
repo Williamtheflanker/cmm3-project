@@ -1,0 +1,335 @@
+import matplotlib.colors
+import numpy as np
+import simulation
+
+# 0 is red, 1 is blue
+color_dictionary = {
+    "red": (1, 0, 0),
+    "blue": (0, 0, 1),
+}
+
+# Read reference solution from file.
+reference_coordinates, reference_concentration = simulation.read_data_file("reference_solution_1D.dat", [0], [1])
+
+
+concentrations2x = []
+
+#for i in range(3):
+for dt in np.linspace(0.01, 0.03, 3):
+    run = simulation.Simulation(dt, 0.2, -1, 1, -1, 1, 16384, 64, 1, 0.1)
+    run.add_rectangle([-1, -1], [1, 2], 1)
+    run.simulate()
+    run.calculate_concentrations()
+    concentrations2x.append(run.concentrations)
+
+concentrations1x = []
+
+#for i in range(3):
+for dt in np.linspace(0.01, 0.03, 3):
+    run = simulation.Simulation(dt, 0.2, -1, 1, -1, 1, 32768, 64, 1, 0.1)
+    run.add_rectangle([-1, -1], [1, 2], 1)
+    run.simulate()
+    run.calculate_concentrations()
+    concentrations1x.append(run.concentrations)
+
+concentrations0 = []
+
+#for i in range(3):
+for dt in np.linspace(0.01, 0.03, 3):
+    run = simulation.Simulation(dt, 0.2, -1, 1, -1, 1, 65536, 64, 1, 0.1)
+    run.add_rectangle([-1, -1], [1, 2], 1)
+    run.simulate()
+    run.calculate_concentrations()
+    concentrations0.append(run.concentrations)
+
+concentrations1 = []
+
+for dt in np.linspace(0.01, 0.03, 3):
+    run = simulation.Simulation(dt, 0.2, -1, 1, -1, 1, 131072, 64, 1, 0.1)
+    run.add_rectangle([-1, -1], [1, 2], 1)
+    run.simulate()
+    run.calculate_concentrations()
+    concentrations1.append(run.concentrations)
+    
+concentrations2 = []
+
+for dt in np.linspace(0.01, 0.03, 3):
+    run = simulation.Simulation(dt, 0.2, -1, 1, -1, 1, 262144, 64, 1, 0.1)
+    run.add_rectangle([-1, -1], [1, 2], 1)
+    run.simulate()
+    run.calculate_concentrations()
+    concentrations2.append(run.concentrations)
+        
+concentrations3 = []
+
+for dt in np.linspace(0.01, 0.03, 3):
+    run = simulation.Simulation(dt, 0.2, -1, 1, -1, 1, 524288, 64, 1, 0.1)
+    run.add_rectangle([-1, -1], [1, 2], 1)
+    run.simulate()
+    run.calculate_concentrations()
+    concentrations3.append(run.concentrations)
+        
+concentrations4 = []
+
+for dt in np.linspace(0.01, 0.03, 3):
+    run = simulation.Simulation(dt, 0.2, -1, 1, -1, 1, 1048576, 64, 1, 0.1)
+    run.add_rectangle([-1, -1], [1, 2], 1)
+    run.simulate()
+    run.calculate_concentrations()
+    concentrations4.append(run.concentrations)
+        
+    
+
+####################################################################
+x = np.linspace(-1,1,64)
+
+
+y6x = concentrations2x[2].flatten()
+y5x = concentrations2x[1].flatten()
+y4x = concentrations2x[0].flatten()
+y3x = concentrations1x[2].flatten()
+y2x = concentrations1x[1].flatten()
+y1x = concentrations1x[0].flatten()
+y0 = concentrations0[0].flatten()
+y1 = concentrations0[1].flatten()
+y2 = concentrations0[2].flatten()
+y3 = concentrations1[0].flatten()
+y4 = concentrations1[1].flatten()
+y5 = concentrations1[2].flatten()
+y6 = concentrations2[0].flatten()
+y7 = concentrations2[1].flatten()
+y8 = concentrations2[2].flatten()
+y9 = concentrations3[0].flatten()
+y10 = concentrations3[1].flatten()
+y11 = concentrations3[2].flatten()
+y12 = concentrations4[0].flatten()
+y13 = concentrations4[1].flatten()
+y14 = concentrations4[2].flatten()
+
+
+h = np.genfromtxt('reference_solution_1D.dat')
+yR = h[0:,1]
+xR = h[0:,0]
+#####################################################################
+
+
+#RMSE Particles:  16384
+
+RMS_errors4x = []
+RMS_errors5x = []
+RMS_errors6x = []
+
+for n in range(63):
+    n4x = (yR[9*n] - y4x[n])**2
+    RMS_errors4x.append(n4x)
+    RMSE4x = np.sqrt(sum(RMS_errors4x)/64)
+    
+    n5x = (yR[9*n] - y5x[n])**2
+    RMS_errors5x.append(n5x)
+    RMSE5x = np.sqrt(sum(RMS_errors5x)/64)
+    
+    n6x = (yR[9*n] - y6x[n])**2
+    RMS_errors6x.append(n6x)
+    RMSE6x = np.sqrt(sum(RMS_errors6x)/64)
+
+#RMSE Particles:  32768
+
+RMS_errors1x = []
+RMS_errors2x = []
+RMS_errors3x = []
+
+for n in range(63):
+    n1x = (yR[9*n] - y1x[n])**2
+    RMS_errors1x.append(n1x)
+    RMSE1x = np.sqrt(sum(RMS_errors1x)/64)
+    
+    n2x = (yR[9*n] - y2x[n])**2
+    RMS_errors2x.append(n2x)
+    RMSE2x = np.sqrt(sum(RMS_errors2x)/64)
+    
+    n3x = (yR[9*n] - y3x[n])**2
+    RMS_errors3x.append(n3x)
+    RMSE3x = np.sqrt(sum(RMS_errors3x)/64)
+
+
+#RMSE Particles: 65536 
+
+
+RMSE_s = []
+
+
+RMS_errors0 = []
+RMS_errors1 = []
+RMS_errors2 = []
+
+for n in range(63):
+    n0 = (yR[9*n] - y0[n])**2
+    RMS_errors0.append(n0)
+    RMSE0 = np.sqrt(sum(RMS_errors0)/64)
+    
+    n1 = (yR[9*n] - y1[n])**2
+    RMS_errors1.append(n1)
+    RMSE1 = np.sqrt(sum(RMS_errors1)/64)
+    
+    n2 = (yR[9*n] - y2[n])**2
+    RMS_errors2.append(n2)
+    RMSE2 = np.sqrt(sum(RMS_errors2)/64)
+    
+#RMSE Particles:  131072
+
+RMS_errors3 = []
+RMS_errors4 = []
+RMS_errors5 = []
+
+for n in range(63):
+    n3 = (yR[9*n] - y3[n])**2
+    RMS_errors3.append(n3)
+    RMSE3 = np.sqrt(sum(RMS_errors3)/64)
+    
+    n4 = (yR[9*n] - y4[n])**2
+    RMS_errors4.append(n4)
+    RMSE4 = np.sqrt(sum(RMS_errors4)/64)
+    
+    n5 = (yR[9*n] - y5[n])**2
+    RMS_errors5.append(n5)
+    RMSE5 = np.sqrt(sum(RMS_errors5)/64)
+    
+#RMSE Particles:  262144
+
+RMS_errors6 = []
+RMS_errors7 = []
+RMS_errors8 = []
+
+for n in range(63):
+    n6 = (yR[9*n] - y6[n])**2
+    RMS_errors6.append(n6)
+    RMSE6 = np.sqrt(sum(RMS_errors6)/64)
+    
+    n7 = (yR[9*n] - y7[n])**2
+    RMS_errors7.append(n7)
+    RMSE7 = np.sqrt(sum(RMS_errors7)/64)
+    
+    n8 = (yR[9*n] - y8[n])**2
+    RMS_errors8.append(n8)
+    RMSE8 = np.sqrt(sum(RMS_errors8)/64)
+    
+#RMSE Particles:  524288
+
+RMS_errors9 = []
+RMS_errors10 = []
+RMS_errors11 = []
+
+for n in range(63):
+    n9 = (yR[9*n] - y9[n])**2
+    RMS_errors9.append(n9)
+    RMSE9 = np.sqrt(sum(RMS_errors9)/64)
+    
+    n10 = (yR[9*n] - y10[n])**2
+    RMS_errors10.append(n10)
+    RMSE10 = np.sqrt(sum(RMS_errors10)/64)
+    
+    n11 = (yR[9*n] - y11[n])**2
+    RMS_errors11.append(n11)
+    RMSE11 = np.sqrt(sum(RMS_errors11)/64)
+    
+#RMSE Particles:  1048576
+
+RMS_errors12 = []
+RMS_errors13 = []
+RMS_errors14 = []
+
+for n in range(63):
+    n12 = (yR[9*n] - y12[n])**2
+    RMS_errors12.append(n12)
+    RMSE12 = np.sqrt(sum(RMS_errors12)/64)
+    
+    n13 = (yR[9*n] - y13[n])**2
+    RMS_errors13.append(n13)
+    RMSE13 = np.sqrt(sum(RMS_errors13)/64)
+    
+    n14 = (yR[9*n] - y14[n])**2
+    RMS_errors14.append(n14)
+    RMSE14 = np.sqrt(sum(RMS_errors14)/64)
+    
+
+  
+  
+RMSE_s.append(RMSE1x)    
+RMSE_s.append(RMSE2x)       
+RMSE_s.append(RMSE3x)   
+RMSE_s.append(RMSE4x)   
+RMSE_s.append(RMSE5x)    
+RMSE_s.append(RMSE6x)               
+RMSE_s.append(RMSE0)   
+RMSE_s.append(RMSE1)    
+RMSE_s.append(RMSE2)       
+RMSE_s.append(RMSE3)   
+RMSE_s.append(RMSE4)   
+RMSE_s.append(RMSE5)    
+RMSE_s.append(RMSE6)       
+RMSE_s.append(RMSE7)   
+RMSE_s.append(RMSE8)   
+RMSE_s.append(RMSE9)    
+RMSE_s.append(RMSE10)       
+RMSE_s.append(RMSE11)   
+RMSE_s.append(RMSE12)   
+RMSE_s.append(RMSE13)    
+RMSE_s.append(RMSE14)       
+
+################################################################################################################################
+
+# Normal Graph
+
+import pylab as pl
+
+RMSE_s
+
+Np = np.array([16384, 16384, 16384, 32769, 32769, 32769, 65536, 65536, 65536, 131072,
+               131072, 131072, 262144, 262144, 262144, 524288, 524288, 524288,
+               1048576, 1048576, 1048576])
+
+pl.figure()
+pl.scatter(Np, RMSE_s)
+pl.title('Np vs E')
+pl.xlabel('Np')
+pl.ylabel('E')
+pl.show()
+
+################################################################################################################################
+
+# log graph
+import matplotlib.pyplot as plt
+ 
+plt.figure()
+plt.scatter(Np, RMSE_s)
+plt.yscale('log')
+plt.xscale('log')
+plt.title('Np vs E (log scale)')
+plt.xlabel('Np')
+plt.ylabel('E')
+plt.show()
+
+#################################################################################################################################
+
+
+# Fitting the graph
+
+from scipy.optimize import curve_fit
+
+def func(w, a, b):
+    return a*(w)**(b)
+
+pars, cov = curve_fit(func, Np, RMSE_s)
+
+a = round(pars[0], 2)
+b = round(pars[1], 2)  # beta
+
+
+# Printing the fitting equation 
+
+from sympy import symbols
+
+E, Np = symbols('E Np')
+
+answr = a*(Np)**b
+answr
